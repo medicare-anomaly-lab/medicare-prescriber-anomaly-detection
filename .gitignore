@@ -1,0 +1,12 @@
+# Big raw downloads stay out of the repo
+data/raw/*
+!data/raw/.gitkeep
+
+__pycache__/
+*.pyc
+.venv/
+.env
+*.json.key
+service_account*.json
+.DS_Store
+.ipynb_checkpoints/

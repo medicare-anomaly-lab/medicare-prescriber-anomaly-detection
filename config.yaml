@@ -1,0 +1,39 @@
+# Settings for the whole pipeline. Change things here, not in the code.
+
+data:
+  raw_dir: data/raw          # big downloads (git-ignored)
+  store_dir: data/store      # small hashed model results (committed, needed for monthly runs)
+  output_dir: outputs        # tables the dashboards read (committed)
+
+  # CMS publishes a catalog of every dataset and its yearly download links here
+  cms_catalog_url: "https://data.cms.gov/data.json"
+  partd_dataset_title: "Medicare Part D Prescribers - by Provider"
+  # If the catalog lookup ever breaks, paste direct CSV links per year here instead
+  partd_csv_urls: {}
+  #   2021: "https://data.cms.gov/sites/default/files/....csv"
+
+  # OIG exclusions list (full file of exclusions currently in effect, updated monthly)
+  leie_url: "https://oig.hhs.gov/exclusions/downloadables/UPDATED.csv"
+
+  # While developing, limit to one state so everything runs fast.
+  # Set to null to run on the whole country.
+  dev_state: "NC"
+
+model:
+  train_years: [2019, 2020, 2021]   # "before" period the model learns from
+  min_total_claims: 50               # skip tiny prescribers (too noisy)
+  min_peer_group_size: 30            # specialties smaller than this get pooled into "Other"
+  contamination: 0.01                # share of providers the model flags (top 1%)
+  n_estimators: 300
+  random_state: 42
+
+validation:
+  # Only count exclusions that happened AFTER the training period.
+  window_start: "2022-01-01"
+  # Exclusion types treated as fraud / prescribing related.
+  # Double check these against OIG's exclusion authorities page before you report results.
+  fraud_excl_types: ["1128a1", "1128a3", "1128a4", "1128b1", "1128b3", "1128b6", "1128b7", "1128b16"]
+  top_pcts: [0.5, 1, 2, 5]           # report lift for the top X% most anomalous
+
+export:
+  flagged_export_pct: 5              # export the top 5% to dashboards (keeps files small)

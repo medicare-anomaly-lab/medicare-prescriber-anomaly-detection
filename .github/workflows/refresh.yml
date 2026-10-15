@@ -1,0 +1,56 @@
+name: Refresh pipeline
+
+on:
+  schedule:
+    - cron: "17 12 15 * *"   # monthly, 15th at 12:17 UTC: new exclusions list, re-validate
+    - cron: "17 12 1 7 *"    # yearly, July 1: CMS usually has the new Part D year out by then
+  workflow_dispatch:          # "Run workflow" button in the Actions tab
+    inputs:
+      stage:
+        description: "full = retrain, monthly = just re-check exclusions"
+        type: choice
+        options: [monthly, full]
+        default: monthly
+
+permissions:
+  contents: write   # lets the workflow commit updated outputs back to the repo
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Pick stage
+        id: stage
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "stage=${{ inputs.stage }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "17 12 1 7 *" ]; then
+            echo "stage=full" >> "$GITHUB_OUTPUT"
+          else
+            echo "stage=monthly" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run pipeline
+        env:
+          PRIVATE_SALT: ${{ secrets.PRIVATE_SALT }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+        run: python run_pipeline.py --stage ${{ steps.stage.outputs.stage }}
+
+      - name: Commit updated outputs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add outputs data/store
+          git diff --cached --quiet || git commit -m "Pipeline refresh (${{ steps.stage.outputs.stage }}) $(date -u +%Y-%m-%d)"
+          git push
