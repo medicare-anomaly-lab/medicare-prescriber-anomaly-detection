@@ -62,6 +62,9 @@ Running notes on decisions, findings, and open questions. Add to this as we go, 
 - Top 5 every year: Nurse Practitioner, Physician Assistant, Dentist, Family Practice, Internal Medicine.
 - **NPs grew 15% (5,943 to 6,840) and PAs 10% (5,571 to 6,117) from 2019 to 2021.** That explains most of the growth in total prescribers.
 - Dentists are the 3rd biggest group, worth a look since dentists prescribe opioids after extractions.
+- The top 5 stays the same every year, so averaging across 2019 to 2021 is safe in terms of specialty mix.
+- **Why we compare within specialty:** each specialty has its own normal (dentist vs family doctor vs neurosurgeon). Pooling everyone would just flag high-prescribing specialties instead of odd individuals.
+- **Limitation: "Nurse Practitioner" is a messy peer group.** CMS lumps all NPs together, but a psychiatric NP, a primary care NP, and a hospital NP prescribe very differently. Some NPs may look unusual just because their setting differs from most NPs. Same likely applies to PAs. Watch for this when reviewing who gets flagged, and mention it in the writeup.
 
 ### Opioid prescribing dropped a lot
 - Median opioid rate: **2019: 2.22% | 2020: 1.59% | 2021: 1.24%**, about a 44% drop in two years.
