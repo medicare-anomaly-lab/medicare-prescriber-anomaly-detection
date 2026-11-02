@@ -68,7 +68,10 @@ Running notes on decisions, findings, and open questions. Add to this as we go, 
 
 ### Opioid prescribing dropped a lot
 - Median opioid rate: **2019: 2.22% | 2020: 1.59% | 2021: 1.24%**, about a 44% drop in two years.
-- **Big implication for features:** a 3% rate means something different in 2019 than in 2021. Don't just average raw rates across years. Compare each prescriber to peers *within the same year* first, then average those comparisons.
+- Why it dropped: NC STOP Act (2017) limiting first-time opioid prescriptions and requiring checks of the state monitoring database, CDC opioid guidelines (2016), fewer elective surgeries and dental visits during COVID (2020), and more NPs and PAs, who tend to prescribe fewer opioids.
+- We used the **median** instead of the mean because the data is skewed. A few prescribers at 60 to 90% would drag the mean up.
+- **Big implication for features:** a 3% rate means something different in 2019 (a bit above typical) than in 2021 (more than double typical). Don't just average raw rates across years. Compare each prescriber to peers in the **same specialty and same year** first, then average those comparisons.
+- **Feature idea: "against the trend."** If almost everyone's opioid rate dropped and a prescriber's went up, that's a strong signal.
 
 ### Missing values
 - Most of the "most missing" columns are **suppression flags** (`_Sprsn_Flag`). Those are blank when nothing was hidden, so high missingness there is actually good news (e.g. `Gnrc_Sprsn_Flag` is 98% blank, generic claims are almost never hidden).
