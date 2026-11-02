@@ -49,11 +49,32 @@ Running notes on decisions, findings, and open questions. Add to this as we go, 
 - Patient demographic columns exist (race, sex, dual status). Don't use race as a model feature: a doctor shouldn't be flagged as unusual because of who their patients are.
 - Being statistically unusual is not evidence of wrongdoing. Don't publish flagged doctors by name (the pipeline hashes IDs).
 
-## Still to explore (Step 1)
+### Prescribers across years
+- 46,764 unique NPIs total. **31,859 (68%) appear in all 3 years**, 6,985 in 2 years, 7,920 in only 1.
+- **Decision needed:** require prescribers to be in all 3 years, or at least 2? Growth features need at least 2 years. Dropping 1-year prescribers loses about 17% but makes averages more stable.
 
-- [ ] How many prescribers appear in all 3 years vs only 1 or 2
-- [ ] Top specialties by year, did the mix change
-- [ ] Median opioid rate by year, is it dropping
-- [ ] Which columns are mostly blank
-- [ ] Share of prescribers under 50 claims
-- [ ] Histogram of opioid rate within one specialty, any extreme outliers
+### Specialty mix
+- Top 5 every year: Nurse Practitioner, Physician Assistant, Dentist, Family Practice, Internal Medicine.
+- **NPs grew 15% (5,943 to 6,840) and PAs 10% (5,571 to 6,117) from 2019 to 2021.** That explains most of the growth in total prescribers.
+- Dentists are the 3rd biggest group, worth a look since dentists prescribe opioids after extractions.
+
+### Opioid prescribing dropped a lot
+- Median opioid rate: **2019: 2.22% | 2020: 1.59% | 2021: 1.24%**, about a 44% drop in two years.
+- **Big implication for features:** a 3% rate means something different in 2019 than in 2021. Don't just average raw rates across years. Compare each prescriber to peers *within the same year* first, then average those comparisons.
+
+### Missing values
+- Most of the "most missing" columns are **suppression flags** (`_Sprsn_Flag`). Those are blank when nothing was hidden, so high missingness there is actually good news (e.g. `Gnrc_Sprsn_Flag` is 98% blank, generic claims are almost never hidden).
+- `Opioid_LA_Prscrbr_Rate` is 67% blank: mostly prescribers with no opioids at all (can't compute a share of zero) plus suppressed small counts.
+- Patient race and older age-group counts are 60 to 70% blank due to suppression, one more reason not to use race as a feature.
+- `Prscrbr_St2` (address line 2) is 77% blank, irrelevant.
+
+### Tiny prescribers
+- **19% of rows have fewer than 50 claims.** A minimum claims cutoff (e.g. 50) drops about a fifth of rows, but those percentages are too noisy to trust.
+
+### Opioid rate within Family Practice (histogram)
+- Strongly right-skewed: most prescribers are under 10%, a small tail stretches out to 60 to 90%.
+- A family practice prescriber at 60%+ is far from their peers, these are the kind of cases the model should surface.
+- Because the data is so skewed, regular z-scores (mean and standard deviation) get pulled around by outliers. Robust z-scores (median and MAD) or log transforms will work better.
+
+## Step 1 status
+- [x] All exploration questions answered. Next: Step 2, turn these findings into features.
