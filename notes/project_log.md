@@ -51,7 +51,12 @@ Running notes on decisions, findings, and open questions. Add to this as we go, 
 
 ### Prescribers across years
 - 46,764 unique NPIs total. **31,859 (68%) appear in all 3 years**, 6,985 in 2 years, 7,920 in only 1.
-- **Decision needed:** require prescribers to be in all 3 years, or at least 2? Growth features need at least 2 years. Dropping 1-year prescribers loses about 17% but makes averages more stable.
+- **Decision: keep prescribers who appear in at least 2 of the 3 years (Option B).** Why:
+  - Two years is enough to measure change, and a sudden spike is one of the most suspicious patterns.
+  - Keeps newer prescribers (lots of NPs and PAs started in 2020), the fastest-growing group.
+  - Doesn't filter out short-lived patterns: someone who prescribes heavily for two years then disappears stays in.
+  - 1-year prescribers dropped: a single year is too noisy and has no trend.
+- **Robustness check planned:** rerun the model keeping only prescribers in all 3 years (Option A) and compare lift. If results are similar, the finding doesn't depend on this choice.
 
 ### Specialty mix
 - Top 5 every year: Nurse Practitioner, Physician Assistant, Dentist, Family Practice, Internal Medicine.
