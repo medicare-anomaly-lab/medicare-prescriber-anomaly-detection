@@ -78,6 +78,23 @@ Running notes on decisions, findings, and open questions. Add to this as we go, 
 - `Opioid_LA_Prscrbr_Rate` is 67% blank: mostly prescribers with no opioids at all (can't compute a share of zero) plus suppressed small counts.
 - Patient race and older age-group counts are 60 to 70% blank due to suppression, one more reason not to use race as a feature.
 - `Prscrbr_St2` (address line 2) is 77% blank, irrelevant.
+- **What a blank means depends on the column.** A blank can mean (1) nothing to report (a blank suppression flag = nothing hidden), (2) doesn't apply (long-acting opioid rate when there are no opioids), or (3) a hidden small number (1 to 10). This is "missing not at random": the blank itself carries information, so don't blindly fill with 0 or drop rows.
+- **Every number has a "buddy" flag column.** Example: a dentist with `Brnd_Tot_Clms` blank and `Brnd_Sprsn_Flag` = `*` (1 to 10 brand prescriptions, hidden), but `Gnrc_Tot_Clms` = 74 with a blank flag (real number shown). A blank flag is the normal case.
+
+### Missingness in the columns we'll actually use
+| Column | Blank |
+|---|---|
+| Brnd_Tot_Clms | 42% |
+| Opioid_LA_Tot_Clms | 37% |
+| Opioid_Tot_Clms / Opioid_Prscrbr_Rate | 29% (same rows, rate is computed from count) |
+| Antbtc_Tot_Clms | 27% |
+| Tot_Benes | 8% (fewer than 11 patients) |
+| Bene_Avg_Risk_Scre | ~0% (1 row) |
+| Tot_Clms, Tot_Drug_Cst, Tot_Day_Suply | 0% |
+
+- **Verified that blank opioid counts mean "1 to 10, hidden," not "none":** 30% of rows have exactly 0 opioids (zeros are reported as 0), and a separate 29% are blank. Blank-opioid prescribers have a median of 130 total claims vs 255 overall: smaller practices, but real ones writing a handful of opioid prescriptions.
+- **Why it matters:** a hidden 1 to 10 barely moves the rate for a prescriber with 5,000 claims (0.02% to 0.2%) but swings it a lot for one with 60 claims (1.7% to 17%). The 50-claim cutoff removes most of the extreme cases.
+- **Decision needed (Step 2):** how to fill hidden counts: 0 (undercounts), 5 (midpoint of 1 to 10), or 5 plus a "was hidden" yes/no column.
 
 ### Tiny prescribers
 - **19% of rows have fewer than 50 claims.** A minimum claims cutoff (e.g. 50) drops about a fifth of rows, but those percentages are too noisy to trust.
