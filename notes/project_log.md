@@ -105,11 +105,29 @@ Running notes on decisions, findings, and open questions. Add to this as we go, 
 - **19% of rows have fewer than 50 claims.** A minimum claims cutoff (e.g. 50) drops about a fifth of rows, but those percentages are too noisy to trust.
 - Example of the noise: a prescriber with 14 claims and 3 opioids shows a 21% rate. One patient can flip the whole percentage.
 - **Decision: drop prescriber-years with fewer than 50 total claims.** Apply this per year first, then apply the 2-of-3-years rule to what's left.
-- **Precedent for the cutoff (what others used on this data):**
-  - **11 claims:** the floor CMS sets itself, records from 10 or fewer claims are excluded for privacy. The CDC's 2019 antibiotic prescriber study kept prescribers with 11 or more antibiotic prescriptions. ([CMS methodology](https://data.cms.gov/sites/default/files/2023-05/MUP_DPR_RY23_20230424_Methodology_508.pdf), [CDC MMWR](https://www.cdc.gov/mmwr/volumes/71/wr/mm7106a3.htm))
-  - **50 prescriptions:** a Journal of General Internal Medicine study comparing opioid prescribing by NPs, PAs, and physicians in Part D selected providers "who prescribed at least 50 prescriptions." Closest match to our project (opioids, same prescriber types). ([J Gen Intern Med](https://link.springer.com/article/10.1007/s11606-020-05823-0))
-  - **100 records:** HHS-OIG's report on questionable Part D prescribing patterns only analyzed general-care physicians with 100+ prescription records totaling $100,000+, and 100+ records for Schedule II/III drug analyses. ([OIG OEI-02-09-00603](https://oig.hhs.gov/oei/reports/oei-02-09-00603.pdf))
-  - **How to explain 50:** it sits between the CMS privacy floor (11) and OIG's stricter fraud-review threshold (100), and matches published opioid research on the same prescriber types.
+
+#### Why we chose 50
+1. **Stable percentages.** At 50+ claims, one extra prescription moves a rate by at most 2 points. At 14 claims it moves it by 7 points, and 3 prescriptions for one patient can look like a 21% opioid rate. Below 50, percentages mostly reflect chance, not prescribing habits.
+2. **Hidden counts matter less.** Our fill-with-5 rule for hidden 1 to 10 counts can be off by up to 4 or 5 prescriptions. At 50+ claims that's a small error; for tiny prescribers it can change the rate by 30+ points.
+3. **Fewer false alarms.** Without a cutoff, the model would flag tiny prescribers just because their numbers bounce around, burying the real cases.
+4. **It follows published research on the same data and prescriber types** (below), and sits between the CMS privacy floor (11) and the threshold OIG used in its own review (100).
+5. **Little fraud risk lost.** Prescribing fraud worth investigating usually involves high volume. We'll verify this in Step 4 (see check below).
+
+#### Research that used 50
+- **Lozada, Raji, Goodwin, Kuo et al. (2020).** "Opioid Prescribing by Primary Care Providers: a Cross-Sectional Analysis of Nurse Practitioner, Physician Assistant, and Physician Prescribing Patterns." *Journal of General Internal Medicine*, 35(9), 2584-2592. ([link](https://link.springer.com/article/10.1007/s11606-020-05823-0))
+  - What they did: compared opioid prescribing by NPs, PAs, and physicians using Medicare Part D data. Methods: "We selected primary care providers who prescribed at least 50 prescriptions."
+  - **Why they used it:** the paper doesn't spell out a reason for 50. The goal is implied: keep prescribers with enough volume that their prescribing rates are meaningful. They acknowledged the tradeoff in their limitations: the cutoff excluded 26% of MDs, 48% of NPs, and 53% of PAs, so "we cannot generalize our findings to those who prescribed less often."
+  - **Why it's the best match for us:** same data (Part D), same focus (opioids), same prescriber types (NPs, PAs, physicians).
+  - **Takeaway for us:** they lost a lot of NPs and PAs with this cutoff. We should check how many NPs and PAs our cutoff drops and mention it as a limitation, same as they did. Our findings won't apply to very low-volume prescribers.
+
+#### Other cutoffs used on this data (for context)
+- **11 claims:** the floor CMS sets itself, records from 10 or fewer claims are excluded for privacy. The CDC's 2019 antibiotic prescriber study kept prescribers with 11+ antibiotic prescriptions. ([CMS methodology](https://data.cms.gov/sites/default/files/2023-05/MUP_DPR_RY23_20230424_Methodology_508.pdf), [CDC MMWR](https://www.cdc.gov/mmwr/volumes/71/wr/mm7106a3.htm))
+- **100 records:** HHS-OIG's 2012 report on questionable Part D prescribing only analyzed general-care physicians with 100+ prescription records totaling $100,000+, and 100+ records for Schedule II/III analyses, focusing their review on high-volume, high-dollar prescribers. ([OIG OEI-02-09-00603](https://oig.hhs.gov/oei/reports/oei-02-09-00603.pdf))
+
+#### Suggested writeup sentence
+"We excluded prescriber-years with fewer than 50 claims, following Lozada et al. (2020), who used the same threshold in a Part D study of opioid prescribing by NPs, PAs, and physicians. Below this level, a single prescription shifts a prescriber's rates by several percentage points, making comparisons unreliable. This threshold sits between the CMS suppression floor (11 claims) and the threshold used in HHS-OIG's review of questionable Part D prescribing (100 records). Our findings therefore do not apply to very low-volume prescribers."
+
+- **To do:** check how many NPs and PAs the 50-claim cutoff drops, and report it as a limitation.
 - **Robustness check planned:** rerun with cutoffs of 11 and 100 and compare lift.
 - **Note: the LEIE has no claims cutoff.** People are excluded for legal reasons (convictions, license loss, etc.), regardless of prescribing volume. OIG's 100-record threshold came from a separate 2012 analytic report, not the exclusion rules, so there's no "their cutoff" to match.
 - **Check in Step 4:** after matching to the LEIE, count how many excluded prescribers fall under 11, 50, and 100 claims. If 50 drops a meaningful share of them, lower the cutoff. This shows the cutoff doesn't throw away the people we're trying to find.
