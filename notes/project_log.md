@@ -93,6 +93,7 @@ Running notes on decisions, findings, and open questions. Add to this as we go, 
 | Tot_Clms, Tot_Drug_Cst, Tot_Day_Suply | 0% |
 
 - **Verified that blank opioid counts mean "1 to 10, hidden," not "none":** 30% of rows have exactly 0 opioids (zeros are reported as 0), and a separate 29% are blank. Blank-opioid prescribers have a median of 130 total claims vs 255 overall: smaller practices, but real ones writing a handful of opioid prescriptions.
+- **The three opioid groups:** 30% wrote exactly 0 (shown as 0), 29% wrote 1 to 10 (hidden, blank), 41% wrote 11 or more (real count shown). So 70% wrote at least one. Filling blanks with 0 would wrongly say 59% wrote none.
 - **Why it matters:** a hidden 1 to 10 barely moves the rate for a prescriber with 5,000 claims (0.02% to 0.2%) but swings it a lot for one with 60 claims (1.7% to 17%). The 50-claim cutoff removes most of the extreme cases.
 - **Decision needed (Step 2):** how to fill hidden counts: 0 (undercounts), 5 (midpoint of 1 to 10), or 5 plus a "was hidden" yes/no column.
 
