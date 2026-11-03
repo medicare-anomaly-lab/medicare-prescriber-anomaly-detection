@@ -150,3 +150,39 @@ Running notes on decisions, findings, and open questions. Add to this as we go, 
 All exploration done. Next: Step 2, turn these findings into features.
 
 
+
+## Step 2: Features (decisions so far)
+
+Each feature is compared to peers in the same specialty and same year (robust z-score), then averaged across a prescriber's years.
+
+### A. How much they prescribe (all kept)
+1. **Prescription volume** `log(Tot_Clms)`: "pill mill" practices write far more prescriptions than peers. Log because volume is very skewed.
+2. **Prescriptions per patient** `Tot_Clms / Tot_Benes`: many prescriptions per patient can mean overprescribing or billing for drugs patients don't need.
+3. **Total drug cost** `log(Tot_Drug_Cst)`: fraud is about money.
+- **Overlap to test later:** volume and total cost likely move together. Check correlation (above ~0.9 = mostly redundant) and run the model with and without one.
+
+### B. What kind of drugs (all kept)
+4. **Cost per prescription** `Tot_Drug_Cst / Tot_Clms`: steering patients to expensive drugs can point to kickbacks.
+5. **Brand-name share** `Brnd_Tot_Clms / Tot_Clms`: kickback schemes usually push brand-name drugs.
+6. **Days supply per prescription** `Tot_Day_Suply / Tot_Clms`: unusually long supplies can mean more pills going out than patients need.
+- **Overlap to test later:** brand share and cost per prescription overlap but catch different things. Cost can be high for legit reasons: sicker patients, or specialty drugs (cancer, HIV, MS, hepatitis C) that are expensive even as generics. Comparing within specialty handles some of this (oncologists only vs oncologists), and the risk score covers patient sickness.
+
+### C. Opioids (first four all kept)
+7. **Opioid rate** `Opioid_Tot_Clms / Tot_Clms` (filled counts, recomputed): classic diversion signal.
+8. **Share of patients on opioids** `Opioid_Tot_Benes / Tot_Benes`: #7 counts prescriptions, this counts people. A few patients with many refills vs many patients each getting opioids are different patterns.
+9. **Long-acting opioid share** `Opioid_LA_Tot_Clms / Opioid_Tot_Clms`: long-acting opioids carry higher overdose and diversion risk. 0 when there are no opioids (doesn't apply), not 5.
+10. **Opioid days per prescription** `Opioid_Tot_Suply / Opioid_Tot_Clms`: the NC STOP Act limits first-time opioid prescriptions to 5 to 7 days.
+
+#### Why we weight opioids heavily on purpose
+Four of our features are about opioids, so the model gives opioid patterns extra weight. This is a deliberate choice. Writeup sentence: "We intentionally included four opioid features because opioid diversion is a major focus of prescribing fraud enforcement."
+
+Evidence:
+- **HHS-OIG has tracked questionable opioid prescribing in Part D every year.** In 2019 (inside our training window), OIG identified 142 prescribers with questionable opioid prescribing, defined as ordering opioids for the highest numbers of patients at serious risk of misuse or overdose (more than 3 standard deviations above the mean, top 0.3%). They ordered 74,820 opioid prescriptions costing Part D $22.1 million. About a third were NPs or PAs. ([OIG OEI-02-20-00320, Aug 2020](https://oig.hhs.gov/oei/reports/OEI-02-20-00320.pdf))
+  - The count dropped from 401 (2016) to 282 (2017) to 198 (2018) to 142 (2019), matching the downward opioid trend we saw in NC.
+  - The fact that a third were NPs or PAs supports keeping those prescriber types in our data.
+- **OIG's earlier report** found about 400 prescribers in 2016 with questionable opioid prescribing for patients at serious risk, patterns "far outside the norm" that "warrant further scrutiny." ([OIG OEI-02-17-00250, Jul 2017](https://oig.hhs.gov/reports/all/2017/opioids-in-medicare-part-d-concerns-about-extreme-use-and-questionable-prescribing/))
+- **Opioid diversion is a standing category in DOJ's yearly National Health Care Fraud Takedown.** The June 2026 takedown charged 36 defendants, including 28 licensed medical professionals, over illegal diversion of prescription opioids and other controlled substances. ([DOJ, Jun 2026](https://www.justice.gov/opa/pr/national-health-care-fraud-takedown-results-455-defendants-charged-connection-over-65))
+- **OIG's method is similar to ours:** they flag prescribers far above the norm (3+ standard deviations). We do the same idea but within specialty and with robust z-scores.
+
+#### Check after modeling
+Look at each flagged prescriber's top reasons. If nearly every flag is opioid-driven, the model is effectively an opioid detector, mention that in the writeup. A mix of reasons (cost, brand share, opioids) means the other features matter too.
