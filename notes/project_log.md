@@ -103,6 +103,15 @@ Running notes on decisions, findings, and open questions. Add to this as we go, 
 
 ### Tiny prescribers
 - **19% of rows have fewer than 50 claims.** A minimum claims cutoff (e.g. 50) drops about a fifth of rows, but those percentages are too noisy to trust.
+- Example of the noise: a prescriber with 14 claims and 3 opioids shows a 21% rate. One patient can flip the whole percentage.
+- **Decision: drop prescriber-years with fewer than 50 total claims.** Apply this per year first, then apply the 2-of-3-years rule to what's left.
+- **Precedent for the cutoff (what others used on this data):**
+  - **11 claims:** the floor CMS sets itself, records from 10 or fewer claims are excluded for privacy. The CDC's 2019 antibiotic prescriber study kept prescribers with 11 or more antibiotic prescriptions. ([CMS methodology](https://data.cms.gov/sites/default/files/2023-05/MUP_DPR_RY23_20230424_Methodology_508.pdf), [CDC MMWR](https://www.cdc.gov/mmwr/volumes/71/wr/mm7106a3.htm))
+  - **50 prescriptions:** a Journal of General Internal Medicine study comparing opioid prescribing by NPs, PAs, and physicians in Part D selected providers "who prescribed at least 50 prescriptions." Closest match to our project (opioids, same prescriber types). ([J Gen Intern Med](https://link.springer.com/article/10.1007/s11606-020-05823-0))
+  - **100 records:** HHS-OIG's report on questionable Part D prescribing patterns only analyzed general-care physicians with 100+ prescription records totaling $100,000+, and 100+ records for Schedule II/III drug analyses. ([OIG OEI-02-09-00603](https://oig.hhs.gov/oei/reports/oei-02-09-00603.pdf))
+  - **How to explain 50:** it sits between the CMS privacy floor (11) and OIG's stricter fraud-review threshold (100), and matches published opioid research on the same prescriber types.
+- **Robustness check planned:** rerun with cutoffs of 11 and 100 and compare lift.
+- **Support for our fill-with-5 decision:** Herland, Khoshgoftaar and Bauder's Medicare fraud detection study (Journal of Big Data, 2018) also imputed 5 for suppressed counts below 11. ([J Big Data](https://link.springer.com/article/10.1186/s40537-018-0138-3)) The CDC study imputed 10 instead, as a conservative choice.
 
 ### Opioid rate within Family Practice (histogram)
 - Strongly right-skewed: most prescribers are under 10%, a small tail stretches out to 60 to 90%.
