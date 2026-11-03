@@ -205,3 +205,27 @@ Look at each flagged prescriber's top reasons. If nearly every flag is opioid-dr
 - Use **z-score changes, not raw changes**, because everyone's opioid rate dropped. A raw drop could still mean cutting back slower than peers.
 - Prescribers with only 2 years (Option B) get last minus first of the two years they have, a smaller window.
 - **Limitation, legit reasons for a jump:** finishing residency or ramping up a new practice, taking over a retiring doctor's patients, going from part-time to full-time, or shifting into hospice/palliative care or pain management (more opioids, for good reason). Some flagged "growth" will be career changes, not fraud.
+
+### E. Patient mix: adjust with regression (Way 2)
+These describe who the patients are, not what the prescriber did. Goal: don't flag a prescriber just for treating sicker or older patients.
+
+**Decision: regression adjustment.** For each behavior feature (1 to 12), within each specialty and year:
+1. Fit a **robust regression**: feature ~ patient risk score + average patient age.
+2. Take each prescriber's **residual** (actual minus expected given their patients).
+3. Turn residuals into **robust z-scores** (median and MAD) within that specialty-year.
+4. Average each prescriber's z-scores across their years. The change features (13, 14) are built from these adjusted z-scores, so they're adjusted too.
+
+Each feature then means: "how far above what we'd expect for a prescriber with patients this sick and this old?"
+
+**What goes in the regression:**
+- **Risk score** (`Bene_Avg_Risk_Scre`): yes, medical need.
+- **Average patient age** (`Bene_Avg_Age`): yes, older patients take more medications (partly captured by risk score already).
+- **Low-income share** (`LIS_Tot_Clms / Tot_Clms`): **no, explanation only.** Some fraud schemes deliberately recruit Medicare and Medicaid beneficiaries for prescriptions they don't need. Adjusting for low-income share could hide those schemes. OIG testimony describes "recruiters" who target drug-seeking patients and "offer them money for the use of their Medicare or Medicaid numbers," and pharmacies "paying patients with cash or narcotics to fill illegitimate and expensive prescriptions." ([OIG Senate testimony, Cantrell and Wright, Jun 2013](https://www.oig.hhs.gov/documents/testimony/133/20130624_-_Cantrell.pdf)) Note: the testimony is about Medicare/Medicaid beneficiaries generally, not low-income share specifically, so frame this as a precaution, not a proven pattern.
+
+**Why Way 2 over risk tiers (Way 1):** smoother and more precise, no arbitrary cutoff, doesn't halve peer groups. Presenting to a technical audience.
+
+**Technical details:**
+- **Use robust regression (`HuberRegressor`), not OLS.** OLS gets pulled toward outliers, and outliers are who we're looking for. Extreme prescribers could tilt the line toward themselves and hide.
+- **Small groups:** specialties with fewer than ~30 prescribers in a year get pooled into "Other" before fitting.
+- **Check it worked:** after adjusting, features should have ~0 correlation with risk score and age. Good slide.
+- **Robustness check:** compare against Way 1 (specialty x year x risk tier above/below median) later.
