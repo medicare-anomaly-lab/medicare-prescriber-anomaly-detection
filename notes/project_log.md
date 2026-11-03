@@ -137,6 +137,16 @@ Running notes on decisions, findings, and open questions. Add to this as we go, 
 - Strongly right-skewed: most prescribers are under 10%, a small tail stretches out to 60 to 90%.
 - A family practice prescriber at 60%+ is far from their peers, these are the kind of cases the model should surface.
 - Because the data is so skewed, regular z-scores (mean and standard deviation) get pulled around by outliers. Robust z-scores (median and MAD) or log transforms will work better.
+- Note: `.hist()` silently skips blanks, so the ~1/3 of prescribers with hidden 1-to-10 opioid counts aren't in this plot.
 
-## Step 1 status
-- [x] All exploration questions answered. Next: Step 2, turn these findings into features.
+#### Family Practice by year (same buckets, side by side)
+- Median opioid rate: **2019: 2.7% | 2020: 2.4% | 2021: 2.2%**, about a 19% drop.
+- **Interesting:** that's much smaller than the 44% drop across all prescribers (#3). So the overall drop isn't just doctors prescribing fewer opioids. A big part is the **mix changing**: more NPs and PAs (who prescribe fewer opioids) entering the data. Good presentation point: an overall trend can partly come from who's in the group, not just behavior change.
+- The spike at 0 to 0.5% grows each year (about 440 to 480 to 540): more family doctors prescribing almost no opioids.
+- The tail past 10% stays thin and similar each year. The extreme prescribers don't disappear.
+- **Plotting lesson:** when comparing groups, use the same bins for all of them and side-by-side panels with a shared y-axis. Overlaid see-through histograms with separate bins were unreadable.
+
+## Step 1 complete
+All exploration done. Next: Step 2, turn these findings into features.
+
+
