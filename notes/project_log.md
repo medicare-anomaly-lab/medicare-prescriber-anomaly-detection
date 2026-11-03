@@ -111,6 +111,8 @@ Running notes on decisions, findings, and open questions. Add to this as we go, 
   - **100 records:** HHS-OIG's report on questionable Part D prescribing patterns only analyzed general-care physicians with 100+ prescription records totaling $100,000+, and 100+ records for Schedule II/III drug analyses. ([OIG OEI-02-09-00603](https://oig.hhs.gov/oei/reports/oei-02-09-00603.pdf))
   - **How to explain 50:** it sits between the CMS privacy floor (11) and OIG's stricter fraud-review threshold (100), and matches published opioid research on the same prescriber types.
 - **Robustness check planned:** rerun with cutoffs of 11 and 100 and compare lift.
+- **Note: the LEIE has no claims cutoff.** People are excluded for legal reasons (convictions, license loss, etc.), regardless of prescribing volume. OIG's 100-record threshold came from a separate 2012 analytic report, not the exclusion rules, so there's no "their cutoff" to match.
+- **Check in Step 4:** after matching to the LEIE, count how many excluded prescribers fall under 11, 50, and 100 claims. If 50 drops a meaningful share of them, lower the cutoff. This shows the cutoff doesn't throw away the people we're trying to find.
 - **Support for our fill-with-5 decision:** Herland, Khoshgoftaar and Bauder's Medicare fraud detection study (Journal of Big Data, 2018) also imputed 5 for suppressed counts below 11. ([J Big Data](https://link.springer.com/article/10.1186/s40537-018-0138-3)) The CDC study imputed 10 instead, as a conservative choice.
 
 ### Opioid rate within Family Practice (histogram)
