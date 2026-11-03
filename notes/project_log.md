@@ -186,3 +186,15 @@ Evidence:
 
 #### Check after modeling
 Look at each flagged prescriber's top reasons. If nearly every flag is opioid-driven, the model is effectively an opioid detector, mention that in the writeup. A mix of reasons (cost, brand share, opioids) means the other features matter too.
+
+### C (continued). Other drug classes (both kept for now)
+11. **Antipsychotics in patients 65+** `Antpsyct_GE65_Tot_Clms / GE65_Tot_Clms`: antipsychotics are sometimes overused in older adults, especially nursing home residents with dementia, to sedate rather than treat a real need. Adds a non-opioid kind of signal. Mostly 0 for prescribers with few older patients.
+   - Evidence: OIG found slightly over half of Medicare-paid antipsychotic claims for elderly nursing home residents should not have been covered (unaccepted uses or no documentation), and 88% were for patients with dementia, a group the FDA warns faces higher risk of death from these drugs. ([OIG news release, Jun 2011, report OEI-07-08-00150](https://oig.hhs.gov/newsroom/news-releases-articles/overmedication-nursing-home-patients-troubling/))
+   - A later OIG report found about 80% of long-stay nursing home residents were prescribed a psychotropic drug (2011-2019), and that Part D claims lack diagnosis codes, limiting oversight. ([OIG, Long-Term Trends of Psychotropic Drug Use in Nursing Homes](https://oig.hhs.gov/reports/all/long-term-trends-of-psychotropic-drug-use-in-nursing-homes))
+12. **Antibiotic rate** `Antbtc_Tot_Clms / Tot_Clms`: more of a care-quality issue than fraud, but kept for now.
+   - **Our hypothesis ("careless prescriber"):** a prescriber who overprescribes in one area may overprescribe across the board, not just opioids. If that's true, antibiotic rate should correlate with opioid rate and help the model.
+   - **Test:** check the correlation between the antibiotic and opioid z-scores, and use SHAP after modeling to see how much the model actually relies on #11 and #12. If they contribute nothing, drop them.
+
+#### Feature importance plan
+- Use **SHAP** to see which features drive each prescriber's anomaly score. SHAP's TreeExplainer works with scikit-learn's Isolation Forest.
+- Use it to answer: are volume and total cost redundant? Do brand share and cost per prescription both matter? Do antipsychotics and antibiotics add anything? Is the model mostly an opioid detector?
