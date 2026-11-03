@@ -222,6 +222,12 @@ Each feature then means: "how far above what we'd expect for a prescriber with p
 - **Average patient age** (`Bene_Avg_Age`): yes, older patients take more medications (partly captured by risk score already).
 - **Low-income share** (`LIS_Tot_Clms / Tot_Clms`): **no, explanation only.** Some fraud schemes deliberately recruit Medicare and Medicaid beneficiaries for prescriptions they don't need. Adjusting for low-income share could hide those schemes. OIG testimony describes "recruiters" who target drug-seeking patients and "offer them money for the use of their Medicare or Medicaid numbers," and pharmacies "paying patients with cash or narcotics to fill illegitimate and expensive prescriptions." ([OIG Senate testimony, Cantrell and Wright, Jun 2013](https://www.oig.hhs.gov/documents/testimony/133/20130624_-_Cantrell.pdf)) Note: the testimony is about Medicare/Medicaid beneficiaries generally, not low-income share specifically, so frame this as a precaution, not a proven pattern.
 
+- **Rural vs urban** (`Prscrbr_RUCA`): **yes, added.** Rural prescribers often see sicker patients with less access to specialists, so a rural family doctor may handle things an urban one would refer out. Encode as metro (RUCA 1 to 3) vs non-metro (RUCA 4 to 10), following the standard USDA RUCA groupings. Check how many prescribers have a missing RUCA code before fitting.
+
+**Example of why low-income share stays out of the adjustment:** two family doctors with equally sick patients (risk score 1.3). Doctor A: 20% low-income patients, 3% opioid rate. Doctor B: 90% low-income patients, 25% opioid rate. Without adjusting for low-income share, B is a huge outlier and gets flagged. If we adjusted for it, the regression would learn "low-income-heavy practices prescribe more," expect maybe 15% for B, and B might not get flagged. That would excuse the exact pattern a patient-recruiting scheme would create. Risk score is different: it comes from diagnoses, so it reflects real medical need. Low income by itself is not a medical need. Use low-income share after flagging, to explain results ("flagged, 90% low-income patients, patients not sicker than average").
+
+**Final regression:** feature ~ risk score + average patient age + rural/urban
+
 **Why Way 2 over risk tiers (Way 1):** smoother and more precise, no arbitrary cutoff, doesn't halve peer groups. Presenting to a technical audience.
 
 **Technical details:**
