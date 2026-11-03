@@ -198,3 +198,10 @@ Look at each flagged prescriber's top reasons. If nearly every flag is opioid-dr
 #### Feature importance plan
 - Use **SHAP** to see which features drive each prescriber's anomaly score. SHAP's TreeExplainer works with scikit-learn's Isolation Forest.
 - Use it to answer: are volume and total cost redundant? Do brand share and cost per prescription both matter? Do antipsychotics and antibiotics add anything? Is the model mostly an opioid detector?
+
+### D. Change over time (both kept)
+13. **"Against the trend" (opioids):** opioid-rate z-score in last year minus first year. Almost everyone cut back on opioids 2019 to 2021, so someone rising relative to peers is moving opposite to everyone else.
+14. **Volume growth:** volume z-score in last year minus first year. A sudden jump relative to peers is a common pattern when a scheme starts.
+- Use **z-score changes, not raw changes**, because everyone's opioid rate dropped. A raw drop could still mean cutting back slower than peers.
+- Prescribers with only 2 years (Option B) get last minus first of the two years they have, a smaller window.
+- **Limitation, legit reasons for a jump:** finishing residency or ramping up a new practice, taking over a retiring doctor's patients, going from part-time to full-time, or shifting into hospice/palliative care or pain management (more opioids, for good reason). Some flagged "growth" will be career changes, not fraud.
