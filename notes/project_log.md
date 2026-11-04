@@ -106,6 +106,24 @@ Running notes on decisions, findings, and open questions. Add to this as we go, 
 - Example of the noise: a prescriber with 14 claims and 3 opioids shows a 21% rate. One patient can flip the whole percentage.
 - **Decision: drop prescriber-years with fewer than 50 total claims.** Apply this per year first, then apply the 2-of-3-years rule to what's left.
 
+#### Chart evidence: how much we don't know when counts are hidden
+For prescribers with a hidden opioid count (true value 1 to 10), the possible opioid rate range for the median prescriber in each volume group:
+
+| Total claims | Hidden prescriber-years | Possible opioid rate |
+|---|---|---|
+| Under 50 | 8,837 | 3.7% to 37.0% |
+| 50-99 | 5,784 | 1.4% to 14.1% |
+| 100-249 | 7,253 | 0.6% to 6.5% |
+| 250-999 | 7,612 | 0.2% to 2.3% |
+| 1,000+ | 4,308 | 0.1% to 0.5% |
+
+- Under 50 claims, we can't tell a prescriber at 4% from one at 37%. The range shrinks fast above 50.
+- About 65% of under-50 rows (8,837 of 13,512) have a hidden opioid count, so most of that group is guesswork.
+- **Honest caveat:** the 50-99 group is still fairly wide (1.4% to 14.1%). The cutoff reduces the problem but doesn't remove it. That's why we also keep the "hidden" yes/no column, and why the 100-claim robustness check matters.
+
+#### Lesson: suppression can quietly skew charts
+Our first version of this chart showed the share of prescribers with an opioid rate over 20% by volume, and small prescribers looked *least* extreme (Under 50: 12.0%, 50-99: 29.6%, 100-249: 27.7%, 250-999: 17.5%, 1,000+: 6.5%). That was an artifact: the chart dropped blank (hidden) rates. A prescriber with 30 claims needs 11+ opioid prescriptions before CMS shows the count (already 37%), so among small prescribers we only see 0% or very high rates, and everyone in between disappears. The visible under-50 group was mostly zeros. Takeaway: always ask which rows a chart silently drops.
+
 #### Why we chose 50
 1. **Stable percentages.** At 50+ claims, one extra prescription moves a rate by at most 2 points. At 14 claims it moves it by 7 points, and 3 prescriptions for one patient can look like a 21% opioid rate. Below 50, percentages mostly reflect chance, not prescribing habits.
 2. **Hidden counts matter less.** Our fill-with-5 rule for hidden 1 to 10 counts can be off by up to 4 or 5 prescriptions. At 50+ claims that's a small error; for tiny prescribers it can change the rate by 30+ points.
