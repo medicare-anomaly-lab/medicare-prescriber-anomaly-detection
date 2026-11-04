@@ -255,6 +255,18 @@ Each feature then means: "how far above what we'd expect for a prescriber with p
 - Without adjusting, the model would flag prescribers just for having sick patients.
 - Note: an earlier hexbin version (risk score vs cost per prescription, log scale) looked almost flat and was hard to read. The grouped bar version is clearer and shows both effects.
 
+**Chart evidence for adding rural/urban** (median opioid rate, all prescribers, raw data):
+
+| Year | Metro (RUCA 1-3) | Non-metro (RUCA 4-10) | Non-metro vs metro |
+|---|---|---|---|
+| 2019 | 2.1% | 2.7% | 1.3x |
+| 2020 | 1.4% | 2.2% | 1.6x |
+| 2021 | 1.0% | 1.9% | 1.9x |
+
+- Non-metro prescribers have a higher median opioid rate every year.
+- The gap is growing: metro dropped about 50% from 2019 to 2021, non-metro only about 30%.
+- **Caveat:** this doesn't separate specialty mix. Rural areas likely have more primary care and fewer specialists, which could explain part of the gap. That's exactly why rural/urban goes into the regression within each specialty-year instead of being judged from this chart alone.
+
 **Example of why low-income share stays out of the adjustment:** two family doctors with equally sick patients (risk score 1.3). Doctor A: 20% low-income patients, 3% opioid rate. Doctor B: 90% low-income patients, 25% opioid rate. Without adjusting for low-income share, B is a huge outlier and gets flagged. If we adjusted for it, the regression would learn "low-income-heavy practices prescribe more," expect maybe 15% for B, and B might not get flagged. That would excuse the exact pattern a patient-recruiting scheme would create. Risk score is different: it comes from diagnoses, so it reflects real medical need. Low income by itself is not a medical need. Use low-income share after flagging, to explain results ("flagged, 90% low-income patients, patients not sicker than average").
 
 **Final regression:** feature ~ risk score + average patient age + rural/urban
