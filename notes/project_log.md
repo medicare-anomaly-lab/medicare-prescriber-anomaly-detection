@@ -73,6 +73,16 @@ Running notes on decisions, findings, and open questions. Add to this as we go, 
 - **Big implication for features:** a 3% rate means something different in 2019 (a bit above typical) than in 2021 (more than double typical). Don't just average raw rates across years. Compare each prescriber to peers in the **same specialty and same year** first, then average those comparisons.
 - **Feature idea: "against the trend."** If almost everyone's opioid rate dropped and a prescriber's went up, that's a strong signal.
 
+### Opioid rate by specialty (boxplot, top 8 specialties, raw data)
+- **Emergency Medicine has the highest median opioid rate** (around 15%) of the top 8. ER doctors write short opioid courses for injuries, but few prescriptions overall, so opioids are a big share. Normal for them, would be extreme for a family doctor.
+- **PAs, NPs, and dentists have very wide spreads.** PA middle 50% runs from about 0 to 20%, with lots of outliers up to 100%. Dentists' median is 0 but many prescribers sit at 15%+ (post-extraction opioids). Consistent with NP/PA being mixed peer groups (different settings).
+- **"Student in an Organized Health Care Education/Training Program" is a top-8 specialty.** These are residents and trainees across many specialties, so like NPs it's a mixed peer group. Add to limitations. Consider whether to keep them at all (they're supervised and often low volume).
+- **OB/GYN** is tightly packed near 0 with outliers, so an OB/GYN at 25% would stand out clearly.
+- Takeaway: each specialty has a completely different "normal," which is why we compare within specialty.
+
+### Opioid groups by year
+- 0 opioids: 28% (2019) to 31% to 32% (2021). Hidden 1 to 10: steady at 28 to 29%. 11+ shown: 43% to 41% to 39%. More prescribers moving to zero, consistent with the downward opioid trend.
+
 ### Missing values
 - Most of the "most missing" columns are **suppression flags** (`_Sprsn_Flag`). Those are blank when nothing was hidden, so high missingness there is actually good news (e.g. `Gnrc_Sprsn_Flag` is 98% blank, generic claims are almost never hidden).
 - `Opioid_LA_Prscrbr_Rate` is 67% blank: mostly prescribers with no opioids at all (can't compute a share of zero) plus suppressed small counts.
@@ -158,7 +168,7 @@ Our first version of this chart showed the share of prescribers with an opioid r
 - Note: `.hist()` silently skips blanks, so the ~1/3 of prescribers with hidden 1-to-10 opioid counts aren't in this plot.
 
 #### Family Practice by year (same buckets, side by side)
-- Median opioid rate: **2019: 2.7% | 2020: 2.4% | 2021: 2.2%**, about a 19% drop.
+- Median opioid rate: **2019: 2.7% | 2020: 2.4% | 2021: 2.2%**, a 17% drop (exact figure from the indexed chart).
 - **Interesting:** that's much smaller than the 44% drop across all prescribers (#3). So the overall drop isn't just doctors prescribing fewer opioids. A big part is the **mix changing**: more NPs and PAs (who prescribe fewer opioids) entering the data. Good presentation point: an overall trend can partly come from who's in the group, not just behavior change.
 - The spike at 0 to 0.5% grows each year (about 440 to 480 to 540): more family doctors prescribing almost no opioids.
 - The tail past 10% stays thin and similar each year. The extreme prescribers don't disappear.
