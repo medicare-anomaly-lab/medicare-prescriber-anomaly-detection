@@ -242,6 +242,19 @@ Each feature then means: "how far above what we'd expect for a prescriber with p
 
 - **Rural vs urban** (`Prscrbr_RUCA`): **yes, added.** Rural prescribers often see sicker patients with less access to specialists, so a rural family doctor may handle things an urban one would refer out. Encode as metro (RUCA 1 to 3) vs non-metro (RUCA 4 to 10), following the standard USDA RUCA groupings. Check how many prescribers have a missing RUCA code before fitting.
 
+**Chart evidence for adjusting by risk score** (prescribers with 50+ claims, median by patient risk group):
+
+| Risk group | Prescriptions per patient | Cost per prescription |
+|---|---|---|
+| Healthier (under 1) | 2.8 | $55 |
+| Average (1 to 1.5) | 3.9 | $68 |
+| Sicker (1.5 to 2.5) | 4.0 | $77 |
+| Much sicker (2.5+) | 4.0 | $79 |
+
+- Sicker patients get about 40% more prescriptions and about 40% pricier ones. Most of the jump is from healthier to average, then it levels off.
+- Without adjusting, the model would flag prescribers just for having sick patients.
+- Note: an earlier hexbin version (risk score vs cost per prescription, log scale) looked almost flat and was hard to read. The grouped bar version is clearer and shows both effects.
+
 **Example of why low-income share stays out of the adjustment:** two family doctors with equally sick patients (risk score 1.3). Doctor A: 20% low-income patients, 3% opioid rate. Doctor B: 90% low-income patients, 25% opioid rate. Without adjusting for low-income share, B is a huge outlier and gets flagged. If we adjusted for it, the regression would learn "low-income-heavy practices prescribe more," expect maybe 15% for B, and B might not get flagged. That would excuse the exact pattern a patient-recruiting scheme would create. Risk score is different: it comes from diagnoses, so it reflects real medical need. Low income by itself is not a medical need. Use low-income share after flagging, to explain results ("flagged, 90% low-income patients, patients not sicker than average").
 
 **Final regression:** feature ~ risk score + average patient age + rural/urban
