@@ -355,3 +355,10 @@ Each filled column gets a yes/no `_hidden` column. Planned: don't feed these int
 
 - Left blank on purpose: opioid days supply in 22,462 rows (the rows with hidden opioid claims), 65+ claims in 7,209 rows (6,851 `#` + 358 `*`).
 - Check passed: 0 blanks left in any filled column.
+
+### Section 3: Raw features (per prescriber-year)
+- 12 raw features built. Volume, total cost, **prescriptions per patient, and cost per prescription are on a log scale** (cost per prescription ranged from $1.83 to $61,080, median $70; prescriptions per patient from 1 to 206).
+- "Doesn't apply" = 0: long-acting share and opioid days are 0 when there are no opioids; antipsychotic share is 0 when there are no 65+ claims.
+- **Bug caught in the sanity check: "guess divided by a guess."** When opioid claims were hidden (filled with 5) and long-acting was also hidden (filled with 5), long-acting share came out as 100% for about a quarter of prescribers (average share 0.29). Fix: long-acting share is blank (unknown) when opioid claims are hidden. After the fix the average is 0.04, median 0.
+- Left blank (unknown, gets the typical value later): long-acting share and opioid days in 22,462 rows (hidden opioid claims), antipsychotic share in 7,209 rows (hidden 65+ claims).
+- Sanity check passed: no shares above 1, no negative values. Median days per prescription 35 (mostly 30-day fills), median opioid rate 2% (matches EDA).
