@@ -368,4 +368,19 @@ Each filled column gets a yes/no `_hidden` column. Planned: don't feed these int
 - **Rural/urban:** 21 rows missing a RUCA code, counted as metro. No missing risk scores or ages.
 - **Method:** for each specialty-year and each of the 12 features, Huber regression on risk score + age + rural (adjusters standardized), residual = actual minus expected, then robust z-score (median/MAD, clipped at ±10). Unknowns (22,462 long-acting share and opioid days, 7,209 antipsychotic share) set to z = 0 ("assume typical"). Runs about 2 minutes on Databricks Free Edition.
 - **Check passed:** after adjusting, correlations between every adjusted feature and risk score, age, and rural are all between -0.07 and +0.07 (most under ±0.04). Patient mix no longer drives the features.
+- **Before vs after** (correlation with risk score / age / rural; before = raw features across all prescribers, after = adjusted z-scores):
+
+| Feature | Before (risk, age, rural) | After (risk, age, rural) |
+|---|---|---|
+| Antipsychotic share | 0.011, **−0.378**, −0.021 | 0.066, −0.066, 0.002 |
+| Cost per prescription | **0.224**, −0.096, −0.065 | 0.027, −0.002, −0.014 |
+| Long-acting share | **0.204**, 0.072, −0.017 | 0.038, 0.032, −0.013 |
+| Volume | −0.061, **0.150**, 0.094 | 0.010, −0.041, −0.006 |
+| Opioid days per prescription | −0.009, **0.142**, 0.062 | 0.032, −0.033, −0.009 |
+| Antibiotic rate | **−0.110**, 0.087, 0.051 | −0.009, −0.067, 0.008 |
+| Opioid rate | 0.013, −0.052, −0.018 | 0.029, −0.036, −0.030 |
+
+  - Biggest before: antipsychotic share vs patient age (−0.38). Likely specialty mix: psychiatry patients on Medicare skew younger (many qualify through disability), and psychiatrists prescribe the most antipsychotics.
+  - Opioid rate barely related to patient mix even before adjusting. Prescriptions per patient vs risk was also small (0.023), contrary to our guess.
+  - Caveat: the "before" numbers pool all specialties, so part of the drop comes from comparing within specialty and year, not just the regression. Present it as "after specialty + patient-mix adjustment".
   - Not exactly 0 because Huber is robust on purpose (doesn't force residuals to be perfectly uncorrelated like OLS would), the z-scores use medians and are clipped, and unknowns were set to 0 afterward. The largest leftovers: antipsychotic share with risk (+0.066) and age (−0.066), antibiotic rate with age (−0.067).
