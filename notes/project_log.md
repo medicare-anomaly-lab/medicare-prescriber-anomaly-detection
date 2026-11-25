@@ -300,5 +300,18 @@ Each feature then means: "how far above what we'd expect for a prescriber with p
 | At least 2 of 3 years | 88,136 | 31,410 (67% of start) |
 
 - **Every row was already an individual (`I`).** No organizations in the NC Part D provider files for these years, so that filter changed nothing. Keep it in the code anyway, in case the national data or later years include organizations.
+- **Who the filters dropped** (unique prescribers, before vs after cutoff + 2-year rule):
+
+| Specialty | Before | After | Kept |
+|---|---|---|---|
+| Dentist | 4,138 | 1,989 | 48.1% |
+| Nurse Practitioner | 7,856 | 5,443 | 69.3% |
+| Physician Assistant | 6,886 | 5,121 | 74.4% |
+| Internal Medicine | 3,999 | 3,029 | 75.7% |
+| Family Practice | 3,881 | 3,268 | 84.2% |
+
+  - **Dentists lose over half.** Most dental patients aren't on Medicare, so many dentists have few Medicare claims. Our dentist results only apply to dentists with a meaningful Medicare practice. Limitation.
+  - **NPs and PAs keep about 70 to 75%**, much more than Lozada et al. (2020), whose 50-prescription cutoff kept only about 52% of NPs and 47% of PAs. Their study was national and primary-care only, so not a direct comparison, but our cutoff costs less than we feared.
+  - Family practice keeps the most (84%): high-volume Medicare prescribers.
 - Saved cleaned data to `/Volumes/workspace/default/raw/partd_nc_clean.parquet`.
 - **Databricks gotcha:** `.toPandas()` attaches hidden query metadata (`df.attrs`) that breaks `to_parquet`. Fix: `df.attrs = {}` before saving.
