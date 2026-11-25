@@ -288,3 +288,17 @@ Each feature then means: "how far above what we'd expect for a prescriber with p
 - **Small groups:** specialties with fewer than ~30 prescribers in a year get pooled into "Other" before fitting.
 - **Check it worked:** after adjusting, features should have ~0 correlation with risk score and age. Good slide.
 - **Robustness check:** compare against Way 1 (specialty x year x risk tier above/below median) later.
+
+## Step 2: Build (results)
+
+### Section 1: Cleaning (notebook `02_features`)
+| Step | Rows | Prescribers |
+|---|---|---|
+| Start (NC 2019 to 2021) | 117,467 | 46,764 |
+| Individuals only | 117,467 | 46,764 |
+| 50-claim cutoff (per year) | 95,118 (dropped 22,349, 19%) | |
+| At least 2 of 3 years | 88,136 | 31,410 (67% of start) |
+
+- **Every row was already an individual (`I`).** No organizations in the NC Part D provider files for these years, so that filter changed nothing. Keep it in the code anyway, in case the national data or later years include organizations.
+- Saved cleaned data to `/Volumes/workspace/default/raw/partd_nc_clean.parquet`.
+- **Databricks gotcha:** `.toPandas()` attaches hidden query metadata (`df.attrs`) that breaks `to_parquet`. Fix: `df.attrs = {}` before saving.
