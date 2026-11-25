@@ -12,7 +12,7 @@ Running notes on decisions, findings, and open questions. Add to this as we go, 
   - Older years (2013 to 2018) skipped because opioid guidelines changed a lot, and the LEIE drops people who were later reinstated, so older data has more missing answers.
   - Idea if time allows: backtest a second window (train 2016 to 2018, check exclusions 2019+) to show the result isn't luck.
 - **Starting with NC only** to keep things fast. Can scale to the whole country later.
-- **Dashboard:** only one (Power BI or Tableau), per assignment rules. Tool not picked yet.
+- **Dashboard: Tableau** (only one allowed per assignment rules). Picked because it shows up more often in job postings. Tableau Public can auto-refresh from a Google Sheet, so the pipeline will write results there.
 
 ## Bugs found
 
