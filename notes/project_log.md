@@ -341,3 +341,17 @@ Each feature then means: "how far above what we'd expect for a prescriber with p
 | Opioid days supply, 65+ claims | Leave blank (can't be guessed well). Prescribers get the typical value for their peer group in section 3 |
 
 Each filled column gets a yes/no `_hidden` column. Planned: don't feed these into the model, use them to check results.
+
+**Fill results:**
+| Value estimated | Share of rows |
+|---|---|
+| Brand | 36.4% (about 19.5 points of that are `#` back-calculated, off by at most 4 or 5; about 17 points are `*` filled with 5) |
+| Long-acting opioids | 35.8% |
+| Opioid patients | 31.4% |
+| Antipsychotics 65+ | 26.4% |
+| Opioid claims | 25.5% |
+| Antibiotics | 21.7% |
+| Total patients | 1.0% |
+
+- Left blank on purpose: opioid days supply in 22,462 rows (the rows with hidden opioid claims), 65+ claims in 7,209 rows (6,851 `#` + 358 `*`).
+- Check passed: 0 blanks left in any filled column.
