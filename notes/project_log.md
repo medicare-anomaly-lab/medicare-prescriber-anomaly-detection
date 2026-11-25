@@ -315,3 +315,29 @@ Each feature then means: "how far above what we'd expect for a prescriber with p
   - Family practice keeps the most (84%): high-volume Medicare prescribers.
 - Saved cleaned data to `/Volumes/workspace/default/raw/partd_nc_clean.parquet`.
 - **Databricks gotcha:** `.toPandas()` attaches hidden query metadata (`df.attrs`) that breaks `to_parquet`. Fix: `df.attrs = {}` before saving.
+
+### Section 2: Filling hidden counts (cleaned data, 88,136 rows)
+**What's hidden after cleaning:**
+- Brand: 56,074 shown, 14,848 `*` (1 to 10), **17,214 `#`** (hidden to prevent back-calculation, can be large). Generic almost always shown (only 312 hidden).
+- Other drugs: 19,780 `*`, 12,586 `#`. 65+ claims: 6,851 `#`, 358 `*`. Antipsychotics 65+: 23,229 `*`.
+- Blank share: other 36.7%, brand 36.4%, long-acting opioids 35.8%, opioid patients 32.2%, antipsychotics 26.4%, opioid claims and opioid supply 25.5%, antibiotics 21.7%, 65+ claims 8.2%, low-income claims 6.5%, patients 1.0%.
+
+**Checks before filling:**
+- **Brand + generic + other = total claims, exactly, in 100% of the 55,766 rows where all three are shown.** So hidden brand counts can be back-calculated.
+- Brand/other flag combinations: brand `#` always pairs with other `*` (17,214), never with other `#`. Brand `*` pairs with other `#` (12,538), other `*` (2,306), or other shown (4). Brand shown with other hidden: 308.
+- So for brand `#`: brand = total − generic − 5 (other is 1 to 10), off by at most 4 or 5. Exact when other is shown.
+- 0 opioid claims (21,353 rows): long-acting is reported as 0 (never blank), but opioid patients is blank in 702 of them. Set to 0, since there can't be opioid patients without opioid claims.
+
+**Fill rules (decided):**
+| Column | Rule |
+|---|---|
+| Brand | Shown: keep. Other shown: total − generic − other (exact). `*`: 5. `#`: total − generic − 5 |
+| Opioid claims | Blank: 5 |
+| Opioid patients | Blank: 5, capped at opioid claims. 0 if no opioids |
+| Long-acting opioids | Blank: 5, capped at opioid claims. 0 if no opioids |
+| Antibiotics | Blank: 5 |
+| Antipsychotics 65+ | `*`: 5 |
+| Total patients | Blank: 5 |
+| Opioid days supply, 65+ claims | Leave blank (can't be guessed well). Prescribers get the typical value for their peer group in section 3 |
+
+Each filled column gets a yes/no `_hidden` column. Planned: don't feed these into the model, use them to check results.
