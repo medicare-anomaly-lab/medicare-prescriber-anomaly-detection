@@ -362,3 +362,10 @@ Each filled column gets a yes/no `_hidden` column. Planned: don't feed these int
 - **Bug caught in the sanity check: "guess divided by a guess."** When opioid claims were hidden (filled with 5) and long-acting was also hidden (filled with 5), long-acting share came out as 100% for about a quarter of prescribers (average share 0.29). Fix: long-acting share is blank (unknown) when opioid claims are hidden. After the fix the average is 0.04, median 0.
 - Left blank (unknown, gets the typical value later): long-acting share and opioid days in 22,462 rows (hidden opioid claims), antipsychotic share in 7,209 rows (hidden 65+ claims).
 - Sanity check passed: no shares above 1, no negative values. Median days per prescription 35 (mostly 30-day fills), median opioid rate 2% (matches EDA).
+
+### Section 4: Adjustment for patient mix + peer comparison
+- **Peer groups:** about 50 specialties per year with 30+ prescribers (2019: 49, 2020: 50, 2021: 50). 1,102 rows (about 1%) pooled into "Other".
+- **Rural/urban:** 21 rows missing a RUCA code, counted as metro. No missing risk scores or ages.
+- **Method:** for each specialty-year and each of the 12 features, Huber regression on risk score + age + rural (adjusters standardized), residual = actual minus expected, then robust z-score (median/MAD, clipped at ±10). Unknowns (22,462 long-acting share and opioid days, 7,209 antipsychotic share) set to z = 0 ("assume typical"). Runs about 2 minutes on Databricks Free Edition.
+- **Check passed:** after adjusting, correlations between every adjusted feature and risk score, age, and rural are all between -0.07 and +0.07 (most under ±0.04). Patient mix no longer drives the features.
+  - Not exactly 0 because Huber is robust on purpose (doesn't force residuals to be perfectly uncorrelated like OLS would), the z-scores use medians and are clipped, and unknowns were set to 0 afterward. The largest leftovers: antipsychotic share with risk (+0.066) and age (−0.066), antibiotic rate with age (−0.067).
